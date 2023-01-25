@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>PDF Text Extraction and Summary</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+        <style>
+            body {
+                background-color: #FFFFFF;
+                font-family: Arial, sans-serif;
+                color: #333;
+                padding-bottom: 100px;
+            }
+
+            .headling {
+                text-align: center;
+                margin: 20px 0;
+                background-color: #C0C0C0;
+            }
+
+            #pdf-form {
+                position: fixed;
+                left: 0; /* Fixed to the left side of the page */
+                top: 50%; /* Position it 50% from the top of the page */
+                transform: translateY(-50%); /* Center it vertically */
+                /*overflow: hidden; /* Prevent scrolling inside the form */
+                display: block;
+                background-color: #D3D3D3;
+                border-radius: 10px;
+                margin: 15px 15px;
+                float: left;
+                width: 20%;
+                height: 90%;
+                top padding: 30px;
+                float: left;
+                padding: 5px;
+                width: 15%;
+            }
+
+
+
+            label, input[type='submit'] {
+                margin: none;
+            }
+
+            #pdf_file {
+                margin-bottom: 10px;
+            }
+
+            .alert {
+                background-color: #e6f2ff;
+                border: 1px solid #99ccff;
+                padding: 20px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+            }
+
+
+            /* Style for the conversation form */
+            #conversation-form {
+                position: fixed;
+                left: 35%;
+                bottom: 0;
+                width: 85%;
+                border: none;
+                float: left;
+                padding: 10px;
+                width: 50%;
+
+
+            }
+
+            input[type=text] {
+                width: 95%;
+                padding: 12px 20px;
+                margin: 5px 0;
+                box-sizing: border-box;
+                border-radius: 10px;
+                background-color: #8b8680;
+                color: white;
+                font-size: 16px;
+            }
+
+            /* Style for the conversation history */
+            #conversation-history {
+                font-size: 16px;
+                margin: 0px 23%;
+            }
+
+    </style>
+
+    <body>
+        <div class="headling">
+        <p>Why read the whole Book (PDF)?!</p>
+        <h3>...Find what you're looking for here ⬇️</h3>
+            <p>(in 43sec or less)<p></div>
+
+        <form id="pdf-form" action="/" method="post" enctype="multipart/form-data">
+            <label for="pdf_file">Select a PDF file to extract text from:</label>
+            <input type="file" id="pdf_file" name="pdf_file">
+            <br>
+            <input type="submit" value="Send">
+        </form>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="alert alert-info">
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        {% endwith %}
+        <div>
+            <p>
+                {% for text in extracted_text %}
+                {{ pdf_path }}<br>
+                {% endfor %}
+              </p>
+        </div>
+        {% if bot_response %}
+            <div id="conversation-history">
+                {% for message in conversation_history %}
+                <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form id="conversation-form" action="/conversation" method="post">
+            <br>
+              <br>
+              <input type="text" id="user_input" name="user_input" placeholder= "Ask me anything">
+
+              <input type="submit" value="Send" style = "display:inline-block">
+          </form>
+          <script>
+          $(document).ready(function(){
+            // Handle form submission
+            $("#form").submit(function(event){
+              event.preventDefault();
+              var userInput = $("#user-input").val();
+              // Make the AJAX call to the server
+              $.ajax({
+                type: "POST",
+                url: "/conversation",
+                data: { user_input: userInput },
+                success: function(response){
+                  // Append the AI's response to the conversation
+                  $("#conversation-history").append("<p>AI: " + response.bot_response + "</p>");
+                  // Clear the input field
+                  $("#user-input").val("");
+                }
+              });
+            });
+          });
+          </script>
+    </body>
+</html>
