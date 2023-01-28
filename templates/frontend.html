@@ -3,38 +3,28 @@
     <head>
         <title>PDF Text Extraction and Summary</title>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    </head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            body {
+
+
+      body {
                 background-color: #FFFFFF;
                 font-family: Arial, sans-serif;
-                color: #333;
+                color: black;
                 padding-bottom: 100px;
             }
 
             .headling {
                 text-align: center;
-                margin: 20px 0;
-                background-color: #C0C0C0;
+                background-color: #3a4c40;
+                box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
+                top padding: 0%;
+                color: white;
             }
 
             #pdf-form {
-                position: fixed;
-                left: 0; /* Fixed to the left side of the page */
-                top: 50%; /* Position it 50% from the top of the page */
-                transform: translateY(-50%); /* Center it vertically */
-                /*overflow: hidden; /* Prevent scrolling inside the form */
-                display: block;
-                background-color: #D3D3D3;
-                border-radius: 10px;
-                margin: 15px 15px;
-                float: left;
-                width: 20%;
-                height: 90%;
-                top padding: 30px;
-                float: left;
-                padding: 5px;
-                width: 15%;
+                box-shadow: rgba(0, 0, 0, 0.06) 0px 2px 4px 0px inset;                padding: 10px;
+                font-size: 14px;
             }
 
 
@@ -59,14 +49,11 @@
             /* Style for the conversation form */
             #conversation-form {
                 position: fixed;
-                left: 35%;
                 bottom: 0;
-                width: 85%;
+                width: 80%;
                 border: none;
-                float: left;
                 padding: 10px;
-                width: 50%;
-
+                left: 10%
 
             }
 
@@ -76,31 +63,62 @@
                 margin: 5px 0;
                 box-sizing: border-box;
                 border-radius: 10px;
-                background-color: #8b8680;
-                color: white;
-                font-size: 16px;
+                background-color: #c2fbd7;
+                color: green;
             }
 
             /* Style for the conversation history */
             #conversation-history {
                 font-size: 16px;
-                margin: 0px 23%;
+                margin: 0px 10%;
             }
 
-    </style>
 
+            /* CSS */
+            .button-33 {
+              background-color: #c2fbd7;
+              border-radius: 100px;
+              box-shadow: rgba(44, 187, 99, .2) 0 -25px 18px -14px inset,rgba(44, 187, 99, .15) 0 1px 2px,rgba(44, 187, 99, .15) 0 2px 4px,rgba(44, 187, 99, .15) 0 4px 8px,rgba(44, 187, 99, .15) 0 8px 16px,rgba(44, 187, 99, .15) 0 16px 32px;
+              color: green;
+              cursor: pointer;
+              display: inline-block;
+              font-family: CerebriSans-Regular,-apple-system,system-ui,Roboto,sans-serif;
+              padding: 7px 20px;
+              text-align: center;
+              text-decoration: none;
+              transition: all 250ms;
+              border: 0;
+              font-size: 16px;
+              user-select: none;
+              -webkit-user-select: none;
+              touch-action: manipulation;
+            }
+
+            .button-33:hover {
+              box-shadow: rgba(44,187,99,.35) 0 -25px 18px -14px inset,rgba(44,187,99,.25) 0 1px 2px,rgba(44,187,99,.25) 0 2px 4px,rgba(44,187,99,.25) 0 4px 8px,rgba(44,187,99,.25) 0 8px 16px,rgba(44,187,99,.25) 0 16px 32px;
+              transform: scale(1.05) rotate(-1deg);
+            }
+
+            /*#pdf-form, #conversation-form {
+                background-color: #3a4c40;
+            } */
+
+
+    </style>
+    </head>
     <body>
         <div class="headling">
         <p>Why read the whole Book (PDF)?!</p>
         <h3>...Find what you're looking for here ⬇️</h3>
-            <p>(in 43sec or less)<p></div>
 
         <form id="pdf-form" action="/" method="post" enctype="multipart/form-data">
-            <label for="pdf_file">Select a PDF file to extract text from:</label>
+            <label for="pdf_file"></label>
             <input type="file" id="pdf_file" name="pdf_file">
-            <br>
-            <input type="submit" value="Send">
+            <input class="button-33" type="submit" value="Send">
+            <p font-size: 8px;>(in 43sec or less)<p>
+
         </form>
+    </div>
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         <div class="alert alert-info">
@@ -131,7 +149,7 @@
               <br>
               <input type="text" id="user_input" name="user_input" placeholder= "Ask me anything">
 
-              <input type="submit" value="Send" style = "display:inline-block">
+              <input class="button-33" type="submit" value="Ask" style = "display:inline-block">
           </form>
           <script>
           $(document).ready(function(){
@@ -156,3 +174,4 @@
           </script>
     </body>
 </html>
+
