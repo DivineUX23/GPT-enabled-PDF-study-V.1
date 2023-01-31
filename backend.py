@@ -4,14 +4,16 @@ This module contains functions and classes for performing various tasks.
 """
 
 #from cmd import PROMPT
-#import sys
+import sys
 import os
 import fitz
-from flask import Flask, render_template, request
 from flask import Flask, render_template, flash, request
-from flask import jsonify
 import tempfile
+import shutil, re
 import openai
+from flask import jsonify
+print(sys.version)
+
 
 app = Flask(__name__, template_folder='templates')
 app = Flask(__name__)
@@ -19,7 +21,7 @@ app.secret_key = 'divine'
 
 
 # Use your own API key
-openai.api_key = "XXXXXXXXXX"
+openai.api_key = "XXXXXXXXXXXXXXXX"
 
 # Initialize an empty list to store the extracted text
 extracted_text = []
@@ -28,7 +30,6 @@ extracted_text = []
 extracting_text = []
 
 conversation_history = []
-
 
 
 chatbot_response = None
@@ -45,6 +46,11 @@ def extract_pdf_text():
     Returns:
         str: The extracted text.
     """
+
+    if request.method == 'GET':
+        flash("Please don't upload a pdf file of over 10 pages. We're still making improvemnts.")
+        return render_template('frontend.html')
+
     if request.method == 'POST':
         global page_number
         pdf_data = None
@@ -91,7 +97,7 @@ def handle_conversation():
     #User input
     user_input = request.form['user_input']
 
-    # Engage in a conversation with the user about the summarized text
+    # To engage in a conversation with the user about the summarized text
     prompt = f"From {extracting_text}. {user_input} specify the page you got the answer. if the answer is not in the book say so and provide your answer.  If no book was provide, say so and ask if I'll like to know anything else keep it simple and straight to the point."
 
     # Use GPT-3 to generate a esponse based on the user's input
@@ -103,7 +109,6 @@ def handle_conversation():
         top_p=1,
         frequency_penalty=0.0,
         presence_penalty=0.0,
-        #stop=["You:"]
     )
     bot_response = completions.choices[0].text
 
@@ -113,6 +118,17 @@ def handle_conversation():
 
     return render_template('frontend.html', bot_response = bot_response, conversation_history=conversation_history)
 
+#for deleting temp file
+
+@app.route('/clear_data', methods=['DELETE'])
+def clear_data():
+        # code to delete the data
+        extracted_text.clear()
+        extracting_text.clear()
+        shutil.rmtree(temp_dir)
+
+        return jsonify(message="cleared successfully"),200
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8000)
