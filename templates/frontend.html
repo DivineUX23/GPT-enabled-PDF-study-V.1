@@ -25,8 +25,8 @@
             #pdf-form {
                 box-shadow: rgba(0, 0, 0, 0.06) 0px 2px 4px 0px inset;                padding: 10px;
                 font-size: 14px;
-            }
 
+            }
 
 
             label, input[type='submit'] {
@@ -75,7 +75,7 @@
 
 
             /* CSS */
-            .button-33 {
+            #button-33 {
               background-color: #c2fbd7;
               border-radius: 100px;
               box-shadow: rgba(44, 187, 99, .2) 0 -25px 18px -14px inset,rgba(44, 187, 99, .15) 0 1px 2px,rgba(44, 187, 99, .15) 0 2px 4px,rgba(44, 187, 99, .15) 0 4px 8px,rgba(44, 187, 99, .15) 0 8px 16px,rgba(44, 187, 99, .15) 0 16px 32px;
@@ -94,14 +94,42 @@
               touch-action: manipulation;
             }
 
-            .button-33:hover {
+            #button-33:hover {
               box-shadow: rgba(44,187,99,.35) 0 -25px 18px -14px inset,rgba(44,187,99,.25) 0 1px 2px,rgba(44,187,99,.25) 0 2px 4px,rgba(44,187,99,.25) 0 4px 8px,rgba(44,187,99,.25) 0 8px 16px,rgba(44,187,99,.25) 0 16px 32px;
               transform: scale(1.05) rotate(-1deg);
             }
 
-            /*#pdf-form, #conversation-form {
-                background-color: #3a4c40;
-            } */
+
+
+
+
+            #myButton {
+              background-color: FF0000;
+              border-radius: 100px;
+              box-shadow: rgba(44, 187, 99, .2) 0 -25px 18px -14px inset,rgba(44, 187, 99, .15) 0 1px 2px,rgba(44, 187, 99, .15) 0 2px 4px,rgba(44, 187, 99, .15) 0 4px 8px,rgba(44, 187, 99, .15) 0 8px 16px,rgba(44, 187, 99, .15) 0 16px 32px;
+              color: red;
+              cursor: pointer;
+              display: inline-block;
+              font-family: CerebriSans-Regular,-apple-system,system-ui,Roboto,sans-serif;
+              padding: 3px 16px;
+              text-align: center;
+              text-decoration: none;
+              transition: all 250ms;
+              border: 0;
+              font-size: 12px;
+              user-select: none;
+              -webkit-user-select: none;
+              touch-action: manipulation;
+            }
+
+            #myButton:hover {
+              box-shadow: rgba(44,187,99,.35) 0 -25px 18px -14px inset,rgba(44,187,99,.25) 0 1px 2px,rgba(44,187,99,.25) 0 2px 4px,rgba(44,187,99,.25) 0 4px 8px,rgba(44,187,99,.25) 0 8px 16px,rgba(44,187,99,.25) 0 16px 32px;
+              transform: scale(1.05) rotate(-1deg);
+            }
+
+
+
+
 
 
     </style>
@@ -110,14 +138,17 @@
         <div class="headling">
         <p>Why read the whole Book (PDF)?!</p>
         <h3>...Find what you're looking for here ⬇️</h3>
+        <p font-size: 8px;>(in 43sec or less)<p>
 
         <form id="pdf-form" action="/" method="post" enctype="multipart/form-data">
             <label for="pdf_file"></label>
-            <input type="file" id="pdf_file" name="pdf_file">
-            <input class="button-33" type="submit" value="Send">
-            <p font-size: 8px;>(in 43sec or less)<p>
+            <input type="file" id="pdf_file" name="pdf_file" accept="application/pdf">
+            <input id="button-33" type="submit" value="Open">
+            <button id="myButton" onclick="removeFile()">Remove Book</button>
 
         </form>
+
+
     </div>
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -149,7 +180,7 @@
               <br>
               <input type="text" id="user_input" name="user_input" placeholder= "Ask me anything">
 
-              <input class="button-33" type="submit" value="Ask" style = "display:inline-block">
+              <input id="button-33" type="submit" value="Ask" style = "display:inline-block">
           </form>
           <script>
           $(document).ready(function(){
@@ -171,7 +202,30 @@
               });
             });
           });
-          </script>
+
+
+    document.getElementById("myButton").addEventListener("click", function(){
+        if (confirm("Are you sure you want to delete the data?")) {
+            fetch('/clear_data', {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Data deleted successfully
+                    alert("Removal cancelled");
+                } else {
+                    // Error deleting data
+                    alert("Removed successfully");
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                alert("Error deleting data");
+            });
+        }
+    });
+
+      </script>
     </body>
 </html>
 
