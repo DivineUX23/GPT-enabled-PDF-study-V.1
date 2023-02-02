@@ -10,6 +10,9 @@ import fitz
 from flask import Flask, render_template, flash, request
 import tempfile
 import shutil, re
+import requests
+from bs4 import BeautifulSoup
+from urllib.request import urlopen
 import openai
 from flask import jsonify
 print(sys.version)
@@ -17,11 +20,11 @@ print(sys.version)
 
 app = Flask(__name__, template_folder='templates')
 app = Flask(__name__)
-app.secret_key = 'divine'
+app.secret_key = "Divine_app"
 
 
 # Use your own API key
-openai.api_key = "XXXXXXXXXXXXXXXX"
+openai.api_key = "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"
 
 # Initialize an empty list to store the extracted text
 extracted_text = []
@@ -34,36 +37,39 @@ conversation_history = []
 
 chatbot_response = None
 page_number = None
-@app.route('/', methods=['GET', 'POST'])
-def extract_pdf_text():
-    """
-    Extracts text from specific pages of a PDF file and returns it as a string.
 
-    Args:
-        pdf_file (FileStorage): The uploaded PDF file.
-        page_numbers (list): A list of integers representing the page numbers to extract.
 
-    Returns:
-        str: The extracted text.
-    """
 
-    if request.method == 'GET':
-        flash("Please don't upload a pdf file of over 10 pages. We're still making improvemnts.")
-        return render_template('frontend.html')
+@app.route('/')
+def index():
+    return render_template('view_pdf.html')
 
-    if request.method == 'POST':
-        global page_number
-        pdf_data = None
-        # Get the uploaded PDF file and page numbers from the form data
+@app.route('/extract', methods=['POST'])
+def extract():
+    global extracting_text
+
+    try:
+        choice = request.form['choice']
+    except KeyError:
+    # Provide a default value or an appropriate error message
+        choice = None
+
+
+        flash("Empty")
+        #print("The 'choice' key is missing from the request.form dictionary")
+
+
+
+    if choice == 'file':
+
         pdf_file = request.files['pdf_file']
-
 
         # Save the PDF file to a temporary location on the filesystem
         with tempfile.TemporaryDirectory() as temp_dir:
             pdf_path = f"{temp_dir}/temp.pdf"
             pdf_file.save(pdf_path)
 
-            flash("File uploaded successfully")
+            flash("PDF file uploaded successfully")
 
 
             # Open the PDF file using PyMuPDF
@@ -81,12 +87,32 @@ def extract_pdf_text():
             # Add the extracted text and page number to the list
             extracting_text.append((text, page_number))
 
-        return render_template('frontend.html', summary=extracting_text)
+        return render_template('view_pdf.html')
 
+
+    elif choice == 'url':
+
+        url = request.form['url']
+        html = urlopen(url).read()
+
+        flash("Link uploaded successfully")
+
+        soup = BeautifulSoup(html, features="html.parser")
+
+        # kill all script and style elements
+        for script in soup(["script", "style"]):
+            script.extract()    # rip it out
+
+        # get text
+        extracting_text = soup.get_text()
+
+
+        return render_template('view_pdf.html')
 
     else:
-        # Render the HTML template for the GET request
-        return render_template('frontend.html')
+        return render_template('view_pdf.html')
+
+
 
 @app.route('/conversation', methods=['POST'])
 def handle_conversation():
@@ -97,8 +123,8 @@ def handle_conversation():
     #User input
     user_input = request.form['user_input']
 
-    # To engage in a conversation with the user about the summarized text
-    prompt = f"From {extracting_text}. {user_input} specify the page you got the answer. if the answer is not in the book say so and provide your answer.  If no book was provide, say so and ask if I'll like to know anything else keep it simple and straight to the point."
+    # Engage in a conversation with the user about the summarized text
+    prompt = f"From {extracting_text}. {user_input} specify the page you got the answer. if the answer is not in the text say so and provide your answer.  If nothing was provide, say so and ask if I'll like to know anything else keep it simple and straight to the point."
 
     # Use GPT-3 to generate a esponse based on the user's input
     completions = openai.Completion.create(
@@ -116,19 +142,18 @@ def handle_conversation():
     conversation_history.append(f"AI: {bot_response}")
 
 
-    return render_template('frontend.html', bot_response = bot_response, conversation_history=conversation_history)
+    return render_template('view_pdf.html', bot_response = bot_response, conversation_history=conversation_history)
 
 #for deleting temp file
 
 @app.route('/clear_data', methods=['DELETE'])
 def clear_data():
         # code to delete the data
-        extracted_text.clear()
         extracting_text.clear()
         shutil.rmtree(temp_dir)
 
-        return jsonify(message="cleared successfully"),200
+        return render_template('frontend.html')
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    app.run(debug=True)
